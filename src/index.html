@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Better future High School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Official website of Better future High School." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="logo">Better future High School</h1>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+        🌙
+      </button>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="hero">
+      <div class="container">
+        <h2>Welcome to Better future High School</h2>
+        <p>
+          A community of learners committed to academic excellence, character, and growth.
+        </p>
+        <a href="#announcements-section" class="btn-primary">View Announcements</a>
+      </div>
+    </section>
+
+    <section class="container section" id="announcements-section">
+      <div class="section-header">
+        <h2>Latest Announcements</h2>
+        <input
+          id="announcementSearch"
+          class="search-input"
+          type="search"
+          placeholder="Search announcements…"
+          aria-label="Search announcements"
+        />
+      </div>
+      <div id="announcements" class="announcements-list">
+        <!-- Filled by JS -->
+      </div>
+      <p id="announcementsEmpty" class="empty-state hidden">
+        No announcements match your search.
+      </p>
+    </section>
+
+    <section class="container section">
+      <h2>Campus Highlights</h2>
+      <div class="cards">
+        <article class="card fade-in">
+          <h3>Academics</h3>
+          <p>
+            Rigorous curriculum, dedicated teachers, and supportive learning environments for every student.
+          </p>
+        </article>
+        <article class="card fade-in">
+          <h3>Activities</h3>
+          <p>
+            Sports, clubs, and arts programs that help students discover and develop their talents.
+          </p>
+        </article>
+        <article class="card fade-in">
+          <h3>Admissions</h3>
+          <p>
+            Learn about enrollment, school tours, and how to join the Better future community.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="container section">
+      <h2>Photo Gallery</h2>
+      <div class="gallery">
+        <img src="images/classroom.jpg" alt="Students in classroom" class="gallery-img" />
+        <img src="images/library.jpg" alt="School library" class="gallery-img" />
+        <img src="images/sports.jpg" alt="Students playing sports" class="gallery-img" />
+      </div>
+    </section>
+  </main>
+
+  <div id="lightbox" class="lightbox hidden" aria-hidden="true">
+    <div class="lightbox-backdrop"></div>
+    <img id="lightbox-img" alt="Enlarged gallery image" />
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> Better future High School. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
