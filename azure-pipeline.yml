@@ -1,0 +1,109 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  imageRepository: 'school-website'
+  dockerfilePath: 'Dockerfile'
+  tag: '$(Build.BuildId)'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+
+# ============================================================
+#  BUILD STAGE
+# ============================================================
+- stage: Build
+  displayName: "Build & Push Docker Image"
+  jobs:
+    - job: BuildAndPush
+      displayName: "Build and Push to ACR"
+      steps:
+        - checkout: self
+
+        - task: Docker@2
+          displayName: "Login to ACR"
+          inputs:
+            command: login
+            containerRegistry: 'acr-connection'
+
+        - task: Docker@2
+          displayName: "Build & Push Image"
+          inputs:
+            command: buildAndPush
+            repository: '$(imageRepository)'
+            dockerfile: '$(dockerfilePath)'
+            containerRegistry: 'acr-connection'
+            tags: |
+              $(tag)
+              latest
+
+        - script: |
+            echo "##vso[task.setvariable variable=fullImageName]$(ACR_NAME)/$(imageRepository):$(tag)"
+          displayName: "Set full image name"
+
+# ============================================================
+#  DEV DEPLOYMENT
+# ============================================================
+- stage: Deploy_Dev
+  displayName: "Deploy to DEV"
+  dependsOn: Build
+  variables:
+    - group: school-dev
+  jobs:
+    - job: DeployDev
+      displayName: "Deploy to DEV Web App"
+      steps:
+        - task: AzureWebAppContainer@1
+          displayName: "Deploy Container to DEV"
+          inputs:
+            azureSubscription: 'azure-sp-connection'
+            appName: '$(WEBAPP_NAME)'
+            resourceGroupName: '$(RESOURCE_GROUP)'
+            containers: |
+              $(ACR_NAME)/$(imageRepository):$(tag)
+
+# ============================================================
+#  STAGING DEPLOYMENT (WITH APPROVAL)
+# ============================================================
+- stage: Deploy_Staging
+  displayName: "Deploy to STAGING"
+  dependsOn: Deploy_Dev
+  variables:
+    - group: school-staging
+  jobs:
+    - job: DeployStaging
+      displayName: "Deploy to STAGING Web App"
+      steps:
+        - task: AzureWebAppContainer@1
+          displayName: "Deploy Container to STAGING"
+          inputs:
+            azureSubscription: 'azure-sp-connection'
+            appName: '$(WEBAPP_NAME)'
+            resourceGroupName: '$(RESOURCE_GROUP)'
+            containers: |
+              $(ACR_NAME)/$(imageRepository):$(tag)
+
+# ============================================================
+#  PRODUCTION DEPLOYMENT (WITH APPROVAL)
+# ============================================================
+- stage: Deploy_Prod
+  displayName: "Deploy to PRODUCTION"
+  dependsOn: Deploy_Staging
+  variables:
+    - group: school-prod
+  jobs:
+    - job: DeployProd
+      displayName: "Deploy to PROD Web App"
+      steps:
+        - task: AzureWebAppContainer@1
+          displayName: "Deploy Container to PROD"
+          inputs:
+            azureSubscription: 'azure-sp-connection'
+            appName: '$(WEBAPP_NAME)'
+            resourceGroupName: '$(RESOURCE_GROUP)'
+            containers: |
+              $(ACR_NAME)/$(imageRepository):$(tag)
